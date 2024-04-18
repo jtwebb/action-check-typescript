@@ -1,6 +1,6 @@
 name: "Check TypeScript Errors Action"
 description: "Check TypeScript errors and compare them with the base branch"
-author: "Arhia"
+author: "wallstead"
 icon: box
 inputs:
   repo-token:

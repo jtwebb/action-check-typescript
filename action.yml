@@ -1,7 +1,8 @@
 name: "Check TypeScript Errors Action"
 description: "Check TypeScript errors and compare them with the base branch"
 author: "wallstead"
-icon: box
+icon: type
+color: orange
 inputs:
   repo-token:
     description: "Token for the repository. Can be passed in using {{ secrets.GITHUB_TOKEN }}"

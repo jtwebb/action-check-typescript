@@ -2,6 +2,9 @@
   <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
 </p>
 
+# Credit
+This action was originally developed by <a href="https://github.com/Arhia/action-check-typescript">Arhia</a> and it worked great but I ran into issues specifically with outputs being too long. <a href="https://github.com/Arhia/action-check-typescript/pull/519">This PR by ChrisWiles</a> fixes those issues but it seems the original action creator never merged in the change. So this action is just the action created by Arhia with fixes by ChrisWiles and re-published in case others ran into the same issue I did. I don't want to take any credit here!
+
 # action-check-typescript
 
 `action-check-typescript` is a GitHub action designed to compile TypeScript files and display the errors found throughout the entire codebase as well as in files changed in pull requests (PRs).

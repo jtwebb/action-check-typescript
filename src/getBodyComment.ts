@@ -1,15 +1,14 @@
-import { ErrorTs } from "./main"
 import { info } from '@actions/core'
 
 const BLANK_LINE = '  \n'
 export const COMMENT_TITLE = '## Typescript errors check'
 
 type Input = {
-    errorsInProjectBefore: ErrorTs[]
-    errorsInProjectAfter: ErrorTs[]
-    newErrorsInProject: ErrorTs[]
-    errorsInModifiedFiles: ErrorTs[]
-    newErrorsInModifiedFiles: ErrorTs[]
+    errorsInProjectBefore: any[]
+    errorsInProjectAfter: any[]
+    newErrorsInProject: any[]
+    errorsInModifiedFiles: any[]
+    newErrorsInModifiedFiles: any[]
 }
 
 export function getBodyComment({ errorsInProjectBefore, errorsInProjectAfter, errorsInModifiedFiles, newErrorsInProject }: Input): string {
@@ -82,7 +81,7 @@ export function getBodyComment({ errorsInProjectBefore, errorsInProjectAfter, er
     return s;
 }
 
-function getListOfErrors(title: string, errors: ErrorTs[], thresholdCollapse = 5): string {
+function getListOfErrors(title: string, errors: any[], thresholdCollapse = 5): string {
 
     const shouldUseCollapsible = errors.length > thresholdCollapse
     let s = ``
@@ -116,11 +115,11 @@ export function escapeForMarkdown(s: string): string {
     return s.replace(/\|/g, '\\|')
 }
 
-function getNbOfErrorsByFile(title: string, errors: ErrorTs[], thresholdCollapse = 5): string {
+function getNbOfErrorsByFile(title: string, errors: any[], thresholdCollapse = 5): string {
 
     const errorsByFile: {
         fileName: string
-        errors: ErrorTs[]
+        errors: any[]
     }[] = []
 
     errors.forEach(err => {

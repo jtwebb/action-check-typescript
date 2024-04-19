@@ -9,21 +9,8 @@ import { getAndValidateArgs, CHECK_FAIL_MODE, OUTPUT_BEHAVIOUR, COMMENT_BEHAVIOU
 import { exec } from '@actions/exec'
 import { COMMENT_TITLE, getBodyComment } from './getBodyComment'
 import { checkoutAndInstallBaseBranch } from './checkoutAndInstallBaseBranch'
-import { compareErrors } from './compareErrors'
 import { runTscCli } from './tscHelpers/runTscCli'
 import { parse } from '@aivenio/tsc-output-parser';
-
-export type ErrorTs = {
-  fileName: string
-  line: number
-  column: number
-  fileNameResolved?: string
-  code: number
-  severity?: string
-  message: string
-  /** for long error messages */
-  extraMsg?: string
-}
 
 async function run(): Promise<void> {
   try {
@@ -131,19 +118,24 @@ async function run(): Promise<void> {
 
     endGroup()
 
-    startGroup(`Comparing errors`)
+     // ***********************************************************************************************
+    //                                              COMPARE ERRORS
+    // ***********************************************************************************************
 
-    const resultCompareErrors = compareErrors({
-      errorsBefore: errorsBaseBranch,
-      errorsAfter: errorsPr,
-      filesChanged: args.filesChanged,
-      filesAdded: args.filesAdded,
-      filesDeleted: args.filesDeleted,
-      lineNumbers: args.lineNumbers
-    })
+    startGroup(`Comparing errors`)
+    info('ending here')
+
+  //   const resultCompareErrors = compareErrors({
+  //     errorsBefore: errorsBaseBranch,
+  //     errorsAfter: errorsPr,
+  //     filesChanged: args.filesChanged,
+  //     filesAdded: args.filesAdded,
+  //     filesDeleted: args.filesDeleted,
+  //     lineNumbers: args.lineNumbers
+  //   })
 
   //   if (args.debug) {
-      info(`${ansiColorsCode.cyan}resultCompareErrors : ${JSON.stringify(resultCompareErrors)}`)
+  //     info(`${ansiColorsCode.cyan}resultCompareErrors : ${JSON.stringify(resultCompareErrors)}`)
   //   }
 
   //   const errorsInModifiedFiles = errorsPr.filter((err: any) => {
@@ -279,9 +271,9 @@ async function run(): Promise<void> {
   //     setFailed(summary)
   //   }
 
-  // } catch (errorRun) {
-  //   setFailed((errorRun as Error).message)
-  // }
+  } catch (errorRun) {
+    setFailed((errorRun as Error).message)
+  }
 }
 
 run()

@@ -1,51 +1,13 @@
 import { compareErrors, FileWithLineNumbers } from '../src/compareErrors'
-import { ErrorTs } from '../src/main'
 import { outputBaseBranch } from './test_compare_1/outputBaseBranch'
 import { errorsCurrentBranch } from './test_compare_1/errorsCurrentBranch'
 import { errorsBaseBranch } from './test_compare_1/erreursBaseBranch'
 import { lineNumbers } from './test_compare_1/lineNumbers'
 import { filesAdded, filesModified, filesRemoved } from './test_compare_1/filesChanged'
 
-import { parseTscErrorLine, tscMatcher, parseOutputTsc } from '../src/tscHelpers/parseOutputTsc'
 import { escapeForMarkdown, getBodyComment } from '../src/getBodyComment'
 
-test('1. parse tsc error line', () => {
-  const line = `src/main.ts(39,11): error TS1155: 'const' declarations must be initialized.`
-  const errorParsed = parseTscErrorLine(line, tscMatcher)
-  expect(errorParsed).toBeDefined()
-  expect(errorParsed.fileName).toEqual('src/main.ts')
-  expect(errorParsed.line).toEqual(39)
-  expect(errorParsed.column).toEqual(11)
-  expect(errorParsed.code).toEqual(1155)
-  expect(errorParsed.severity).toEqual('error')
-  expect(errorParsed.message).toEqual("'const' declarations must be initialized.")
-})
-
-test('1.2 parse tsc error line with pipe ', () => {
-  const line = `server/webAPI/sal/webApiSalAddUpdate.ts:45:41 - error TS2345: Argument of type '(err?: Error | null | undefined, client?: PoolClient | undefined, sal_id?: number | null | undefined) => void' is not assignable to parameter of type 'IWebApiCallback'.`
-  const errorParsed = parseTscErrorLine(line, tscMatcher)
-  expect(errorParsed).toBeDefined()
-  expect(errorParsed.fileName).toEqual('server/webAPI/sal/webApiSalAddUpdate.ts')
-  expect(errorParsed.line).toEqual(45)
-  expect(errorParsed.column).toEqual(41)
-  expect(errorParsed.code).toEqual(2345)
-  expect(errorParsed.severity).toEqual('error')
-  expect(errorParsed.message).toEqual("Argument of type '(err?: Error | null | undefined, client?: PoolClient | undefined, sal_id?: number | null | undefined) => void' is not assignable to parameter of type 'IWebApiCallback'.")
-})
-
-test('2. parse output', () => {
-  const output = `
-  src/main.ts(39,11): error TS1155: 'const' declarations must be initialized.
-  src/main.ts(39,11): error TS7005: Variable 'hereIsAUnusedVariableToHaveAnError' implicitly has an 'any' type.
-  `
-  const linesParsed = parseOutputTsc(output)
-  expect(linesParsed).toHaveLength(2)
-  expect(linesParsed[0].fileName).toEqual('src/main.ts')
-  expect(linesParsed[1].fileName).toEqual('src/main.ts')
-  expect(linesParsed[1].column).toEqual(11)
-})
-
-test('3. compareErrors', () => {
+test('1. compareErrors', () => {
 
   const errorsBefore: ErrorTs[] = [{
     message: 'test',

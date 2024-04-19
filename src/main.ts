@@ -11,7 +11,7 @@ import { COMMENT_TITLE, getBodyComment } from './getBodyComment'
 import { checkoutAndInstallBaseBranch } from './checkoutAndInstallBaseBranch'
 import { compareErrors } from './compareErrors'
 import { runTscCli } from './tscHelpers/runTscCli'
-import { parseOutputTsc } from './tscHelpers/parseOutputTsc'
+import { parse } from '@aivenio/tsc-output-parser';
 
 export type ErrorTs = {
   fileName: string
@@ -88,7 +88,7 @@ async function run(): Promise<void> {
       tsconfigPath
     })
 
-    const errorsPr = parseOutputTsc(tscOutputCurrent)
+    const errorsPr = parse(tscOutputCurrent)
 
     info(`[current branch] : ${errorsPr.length} error(s) detected`)
 
@@ -121,7 +121,7 @@ async function run(): Promise<void> {
       tsconfigPath
     })
 
-    const errorsBaseBranch = parseOutputTsc(tscOutputBase)
+    const errorsBaseBranch = parse(tscOutputBase)
 
     info(`[base branch] : ${errorsBaseBranch.length} error(s) detected`)
 
@@ -142,141 +142,146 @@ async function run(): Promise<void> {
       lineNumbers: args.lineNumbers
     })
 
-    if (args.debug) {
-      info(`${ansiColorsCode.cyan}Contenu de resultCompareErrors : ${JSON.stringify(resultCompareErrors)}`)
-    }
+  //   if (args.debug) {
+      info(`${ansiColorsCode.cyan}resultCompareErrors : ${JSON.stringify(resultCompareErrors)}`)
+  //   }
 
-    const errorsInModifiedFiles = errorsPr.filter(err => {
-      return args.filesChanged.concat(args.filesAdded).includes(err.fileName)
-    })
+  //   const errorsInModifiedFiles = errorsPr.filter((err: any) => {
+  //     return args.filesChanged.concat(args.filesAdded).includes(err.fileName)
+  //   })
 
-    info(`${errorsInModifiedFiles.length} errors in modified files`)
+  //   info(`${errorsInModifiedFiles.length} errors in modified files`)
 
-    const newErrorsInModifiedFiles = resultCompareErrors.errorsAdded.filter(err => {
-      return args.filesChanged.concat(args.filesAdded).includes(err.fileName)
-    })
+  //   const newErrorsInModifiedFiles = resultCompareErrors.errorsAdded.filter(err => {
+  //     return args.filesChanged.concat(args.filesAdded).includes(err.fileName)
+  //   })
 
-    info(`${newErrorsInModifiedFiles.length} added errors in modified files`)
+  //   info(`${newErrorsInModifiedFiles.length} added errors in modified files`)
 
-    endGroup()
+  //   endGroup()
 
-    if ([OUTPUT_BEHAVIOUR.ANNOTATE, OUTPUT_BEHAVIOUR.COMMENT_AND_ANNOTATE].includes(args.outputBehaviour)) {
-      resultCompareErrors.errorsAdded.forEach(err => {
-        error(`${err.fileName}:${err.line}:${err.column} - ${err.message}`, {
-          file: err.fileName,
-          startLine: err.line,
-          startColumn: err.column,
-          title: err.extraMsg ?? err.message
-        })
-      })
-    }
+  //   if ([OUTPUT_BEHAVIOUR.ANNOTATE, OUTPUT_BEHAVIOUR.COMMENT_AND_ANNOTATE].includes(args.outputBehaviour)) {
+  //     resultCompareErrors.errorsAdded.forEach(err => {
+  //       const errorFileName = err.value.path.value;
+  //       const errorLineNumber = err.value.cursor.value.line;
+  //       const errorColumnNumber = err.value.cursor.value.col;
+  //       const errorMessage = err.value.message.value;
 
-    if ([OUTPUT_BEHAVIOUR.COMMENT, OUTPUT_BEHAVIOUR.COMMENT_AND_ANNOTATE].includes(args.outputBehaviour)) {
-      startGroup(`Creating comment`)
+  //       error(`${errorFileName}:${errorLineNumber}:${errorColumnNumber} - ${errorMessage}`, {
+  //         file: errorFileName,
+  //         startLine: errorLineNumber,
+  //         startColumn: errorColumnNumber,
+  //         title: errorMessage
+  //       })
+  //     })
+  //   }
 
-      const issueNumber = context.payload.pull_request!.number
+  //   if ([OUTPUT_BEHAVIOUR.COMMENT, OUTPUT_BEHAVIOUR.COMMENT_AND_ANNOTATE].includes(args.outputBehaviour)) {
+  //     startGroup(`Creating comment`)
 
-      const commentInfo = {
-        ...context.repo,
-        issue_number: issueNumber
-      }
+  //     const issueNumber = context.payload.pull_request!.number
 
-      const comment = {
-        ...commentInfo,
-        body: getBodyComment({
-          errorsInProjectBefore: errorsBaseBranch,
-          errorsInProjectAfter: errorsPr,
-          newErrorsInProject: resultCompareErrors.errorsAdded,
-          errorsInModifiedFiles,
-          newErrorsInModifiedFiles
-        })
-      }
-      info(`comment body obtained`)
+  //     const commentInfo = {
+  //       ...context.repo,
+  //       issue_number: issueNumber
+  //     }
 
-      try {
-        const existingComments = await octokit.rest.issues.listComments({owner: context.repo.owner, repo: context.repo.repo, issue_number: issueNumber})
-        const existingComment = existingComments.data.find(c => !!c.body?.includes(COMMENT_TITLE))
+  //     const comment = {
+  //       ...commentInfo,
+  //       body: getBodyComment({
+  //         errorsInProjectBefore: errorsBaseBranch,
+  //         errorsInProjectAfter: errorsPr,
+  //         newErrorsInProject: resultCompareErrors.errorsAdded,
+  //         errorsInModifiedFiles,
+  //         newErrorsInModifiedFiles
+  //       })
+  //     }
+  //     info(`comment body obtained`)
 
-        if (args.commentBehaviour === COMMENT_BEHAVIOUR.EDIT && existingComment) {
-          await octokit.rest.issues.updateComment({
-            comment_id: existingComment.id,
-            ...comment
-          })
-        } else {
-          await octokit.rest.issues.createComment(comment)
-        }
-      } catch (e) {
-        info(`Error creating comment: ${(e as Error).message}`)
-        info(`Submitting a PR review comment instead...`)
-        try {
-          const issue = context.issue || pr
-          await octokit.rest.pulls.createReview({
-            owner: issue.owner,
-            repo: issue.repo,
-            pull_number: issue.number,
-            event: 'COMMENT',
-            body: comment.body
-          })
-        } catch (errCreateComment) {
-          info(`Error creating PR review ${(errCreateComment as Error).message}`)
-        }
-      }
+  //     try {
+  //       const existingComments = await octokit.rest.issues.listComments({owner: context.repo.owner, repo: context.repo.repo, issue_number: issueNumber})
+  //       const existingComment = existingComments.data.find(c => !!c.body?.includes(COMMENT_TITLE))
 
-      info(`comment created`)
+  //       if (args.commentBehaviour === COMMENT_BEHAVIOUR.EDIT && existingComment) {
+  //         await octokit.rest.issues.updateComment({
+  //           comment_id: existingComment.id,
+  //           ...comment
+  //         })
+  //       } else {
+  //         await octokit.rest.issues.createComment(comment)
+  //       }
+  //     } catch (e) {
+  //       info(`Error creating comment: ${(e as Error).message}`)
+  //       info(`Submitting a PR review comment instead...`)
+  //       try {
+  //         const issue = context.issue || pr
+  //         await octokit.rest.pulls.createReview({
+  //           owner: issue.owner,
+  //           repo: issue.repo,
+  //           pull_number: issue.number,
+  //           event: 'COMMENT',
+  //           body: comment.body
+  //         })
+  //       } catch (errCreateComment) {
+  //         info(`Error creating PR review ${(errCreateComment as Error).message}`)
+  //       }
+  //     }
 
-      endGroup()
-    }
+  //     info(`comment created`)
 
-    let shouldFailCheck = false
-    let title = ''
-    let summary = ''
+  //     endGroup()
+  //   }
 
-    if (args.checkFailMode === CHECK_FAIL_MODE.ON_ERRORS_ADDED_IN_PR) {
-      shouldFailCheck = resultCompareErrors.errorsAdded.length > 0
-      if (shouldFailCheck) {
-        title = `${resultCompareErrors.errorsAdded.length} ts errors added by this PR.`
-        summary = `${resultCompareErrors.errorsAdded.length} ts errors added by this PR.`
-      } else {
-        title = `No ts errors added.`
-        summary = `No ts errors added.`
-      }
-    } else if (args.checkFailMode === CHECK_FAIL_MODE.ON_ERRORS_PRESENT_IN_PR) {
-      shouldFailCheck = errorsInModifiedFiles.length > 0
-      if (shouldFailCheck) {
-        title = `${errorsInModifiedFiles.length} ts errors present in modified files.`
-        summary = `${errorsInModifiedFiles.length} ts errors present in modified files.`
-      } else {
-        title = `No ts errors in modified files.`
-        summary = `No ts errors in modified files.`
-      }
-    } else if (args.checkFailMode === CHECK_FAIL_MODE.ON_ERRORS_PRESENT_IN_CODE) {
-      shouldFailCheck = errorsPr.length > 0
-      if (shouldFailCheck) {
-        title = `${errorsPr.length} ts errors in the PR branch.`
-        summary = `${errorsPr.length} ts errors in the PR branch.`
-      } else {
-        title = `No ts errors in the PR branch.`
-        summary = `No ts errors in the PR branch.`
-      }
-    }
+  //   let shouldFailCheck = false
+  //   let title = ''
+  //   let summary = ''
 
-    if (args.useCheck) {
-      const finish = await createCheck(octokit, context, "Check ts errors")
+  //   if (args.checkFailMode === CHECK_FAIL_MODE.ON_ERRORS_ADDED_IN_PR) {
+  //     shouldFailCheck = resultCompareErrors.errorsAdded.length > 0
+  //     if (shouldFailCheck) {
+  //       title = `${resultCompareErrors.errorsAdded.length} ts errors added by this PR.`
+  //       summary = `${resultCompareErrors.errorsAdded.length} ts errors added by this PR.`
+  //     } else {
+  //       title = `No ts errors added.`
+  //       summary = `No ts errors added.`
+  //     }
+  //   } else if (args.checkFailMode === CHECK_FAIL_MODE.ON_ERRORS_PRESENT_IN_PR) {
+  //     shouldFailCheck = errorsInModifiedFiles.length > 0
+  //     if (shouldFailCheck) {
+  //       title = `${errorsInModifiedFiles.length} ts errors present in modified files.`
+  //       summary = `${errorsInModifiedFiles.length} ts errors present in modified files.`
+  //     } else {
+  //       title = `No ts errors in modified files.`
+  //       summary = `No ts errors in modified files.`
+  //     }
+  //   } else if (args.checkFailMode === CHECK_FAIL_MODE.ON_ERRORS_PRESENT_IN_CODE) {
+  //     shouldFailCheck = errorsPr.length > 0
+  //     if (shouldFailCheck) {
+  //       title = `${errorsPr.length} ts errors in the PR branch.`
+  //       summary = `${errorsPr.length} ts errors in the PR branch.`
+  //     } else {
+  //       title = `No ts errors in the PR branch.`
+  //       summary = `No ts errors in the PR branch.`
+  //     }
+  //   }
 
-      await finish({
-        conclusion: shouldFailCheck ? 'failure' : 'success',
-        output: {
-          title: title,
-          summary: summary
-        }
-      })
-    } else if (shouldFailCheck) {
-      setFailed(summary)
-    }
+  //   if (args.useCheck) {
+  //     const finish = await createCheck(octokit, context, "Check ts errors")
 
-  } catch (errorRun) {
-    setFailed((errorRun as Error).message)
-  }
+  //     await finish({
+  //       conclusion: shouldFailCheck ? 'failure' : 'success',
+  //       output: {
+  //         title: title,
+  //         summary: summary
+  //       }
+  //     })
+  //   } else if (shouldFailCheck) {
+  //     setFailed(summary)
+  //   }
+
+  // } catch (errorRun) {
+  //   setFailed((errorRun as Error).message)
+  // }
 }
 
 run()

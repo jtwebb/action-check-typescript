@@ -1,26 +1,22 @@
+import { ErrorTs } from "./main"
 import { info } from '@actions/core'
 
 const BLANK_LINE = '  \n'
 export const COMMENT_TITLE = '## Typescript errors check'
 
 type Input = {
-    errorsInProjectBefore: any[]
-    errorsInProjectAfter: any[]
-    newErrorsInProject: any[]
-    errorsInModifiedFiles: any[]
-    newErrorsInModifiedFiles: any[]
+    errorsInProjectBefore: ErrorTs[]
+    errorsInProjectAfter: ErrorTs[]
+    newErrorsInProject: ErrorTs[]
+    errorsInModifiedFiles: ErrorTs[]
+    newErrorsInModifiedFiles: ErrorTs[]
 }
 
 export function getBodyComment({ errorsInProjectBefore, errorsInProjectAfter, errorsInModifiedFiles, newErrorsInProject }: Input): string {
 
+    info(`errorsInProjectBefore: ${errorsInProjectBefore}, errorsInProjectAfter: ${errorsInProjectAfter}, errorsInModifiedFiles: ${errorsInModifiedFiles}, newErrorsInProject: ${newErrorsInProject}`);
     const delta = errorsInProjectAfter.length - errorsInProjectBefore.length
     let s = `${COMMENT_TITLE}  \n`
-
-    s += `errorsInProjectBefore: ${errorsInProjectBefore.length}\n`;
-    s += `errorsInProjectAfter: ${errorsInProjectAfter.length}\n`;
-    s += `errorsInModifiedFiles: ${errorsInModifiedFiles.length}\n`;
-    s += `newErrorsInProject: ${newErrorsInProject.length}\n`;
-    s += `delta (after - before): ${delta}\n`;
 
     const areStillErrors = !!errorsInProjectAfter.length
 
@@ -81,7 +77,7 @@ export function getBodyComment({ errorsInProjectBefore, errorsInProjectAfter, er
     return s;
 }
 
-function getListOfErrors(title: string, errors: any[], thresholdCollapse = 5): string {
+function getListOfErrors(title: string, errors: ErrorTs[], thresholdCollapse = 5): string {
 
     const shouldUseCollapsible = errors.length > thresholdCollapse
     let s = ``
@@ -115,11 +111,11 @@ export function escapeForMarkdown(s: string): string {
     return s.replace(/\|/g, '\\|')
 }
 
-function getNbOfErrorsByFile(title: string, errors: any[], thresholdCollapse = 5): string {
+function getNbOfErrorsByFile(title: string, errors: ErrorTs[], thresholdCollapse = 5): string {
 
     const errorsByFile: {
         fileName: string
-        errors: any[]
+        errors: ErrorTs[]
     }[] = []
 
     errors.forEach(err => {

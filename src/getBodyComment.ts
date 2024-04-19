@@ -1,4 +1,5 @@
 import { ErrorTs } from "./main"
+import { info } from '@actions/core'
 
 const BLANK_LINE = '  \n'
 export const COMMENT_TITLE = '## Typescript errors check'
@@ -13,6 +14,7 @@ type Input = {
 
 export function getBodyComment({ errorsInProjectBefore, errorsInProjectAfter, errorsInModifiedFiles, newErrorsInProject }: Input): string {
 
+    info(`errorsInProjectBefore: ${errorsInProjectBefore}, errorsInProjectAfter: ${errorsInProjectAfter}, errorsInModifiedFiles: ${errorsInModifiedFiles}, newErrorsInProject: ${newErrorsInProject}`);
     const delta = errorsInProjectAfter.length - errorsInProjectBefore.length
     let s = `${COMMENT_TITLE}  \n`
 

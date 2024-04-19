@@ -17,12 +17,12 @@ type Result = {
 }
 
 /**
- * A partir des erreurs ts de la base branche
+ * Compare errors from the current and base branches
  */
 export function compareErrors({ errorsBefore, errorsAfter, filesChanged, filesAdded, lineNumbers }: Input): Result {
 
     /*
-    on va déterminer numéro de ligne dans correspondant dans le fichier modifié dans la PR
+        Determine line numbers of the errors in the base branch. If the file is modified in the current branch, we will 
     */
     const errorsBeforeTransformed: (ErrorTs & { lineInPr: number })[] = errorsBefore.map(errBefore => {
 
@@ -36,7 +36,7 @@ export function compareErrors({ errorsBefore, errorsAfter, filesChanged, filesAd
 
         const lineNumbersForThisFile = lineNumbers.find(o => o.path === errBefore.fileName)
         if (!lineNumbersForThisFile) {
-            warning(`Impossible de trouver les line numbers pour le fichier ${errBefore.fileName}`)
+            warning(`Unable to find line numbers for file ${errBefore.fileName}`)
             return {
                 ...errBefore,
                 lineInPr: errBefore.line

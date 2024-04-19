@@ -30,7 +30,7 @@ export function getBodyComment({ errorsInProjectBefore, errorsInProjectAfter, er
             s += `You have added ${delta} errors with this PR 😥  \n`
             s += BLANK_LINE
         }
-        s += `**${errorsInProjectAfter.length} ts error${errorsInProjectAfter.length === 1 ? '' : 's'} detected in the codebase 😟.**  \n`
+        s += `**${errorsInProjectAfter.length} TS error${errorsInProjectAfter.length === 1 ? '' : 's'} detected in the entire codebase 😟.**  \n`
         s += getNbOfErrorsByFile(`Details`, errorsInProjectAfter)
         s += BLANK_LINE
         s += BLANK_LINE
@@ -38,20 +38,23 @@ export function getBodyComment({ errorsInProjectBefore, errorsInProjectAfter, er
     }
 
     if (!areStillErrors) {
-        s += `No ts errors in the codebase ! 🎉  \n`
+        s += `No TS errors in the codebase ! 🎉  \n`
         s += BLANK_LINE
         if (delta < 0) {
-            s += `Congrats, you have removed ${-delta} ts error${-delta === 1 ? '' : 's'} with this PR 💪  \n`
+            s += `Congrats, you have removed ${-delta} TS error${-delta === 1 ? '' : 's'} with this PR 💪  \n`
             s += BLANK_LINE
         }
         return s
     }
 
     if (!errorsInModifiedFiles.length) {
-        s += `Well done! No ts errors in files changed in this PR! 🎉 \n`
+        s += `Well done! No TS errors in files changed in this PR! 🎉 \n`
+        if (delta > 0) {
+            s += `This means that your changes have resulted in type error(s) outside of the changed files. \n`
+        }
         s += BLANK_LINE
     } else {
-        s += `**${errorsInModifiedFiles.length} ts error${errorsInModifiedFiles.length === 1 ? '' : 's'} detected in the modified files.**  \n`
+        s += `**${errorsInModifiedFiles.length} TS error${errorsInModifiedFiles.length === 1 ? '' : 's'} detected in the modified files.**  \n`
         s += BLANK_LINE
         s += getListOfErrors(`Details`, errorsInModifiedFiles)
         s += BLANK_LINE

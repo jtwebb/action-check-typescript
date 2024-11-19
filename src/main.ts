@@ -118,7 +118,7 @@ async function run(): Promise<void> {
 
     const { output: tscOutputBase } = await runTscCli({
       workingDir,
-      files: args.filesChanged.concat(args.filesAdded)
+      files: args.filesChanged
     })
 
     const errorsBaseBranch = parseOutputTsc(tscOutputBase)

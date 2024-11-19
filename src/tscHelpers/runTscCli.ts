@@ -39,7 +39,7 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
     '--watch',
     'false',
     '--allowJs',
-    'false',
+    'true',
     '--noImplicitAny',
     'true'
   ]

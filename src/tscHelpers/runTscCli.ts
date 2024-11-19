@@ -43,9 +43,6 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
     '--noImplicitAny',
     'true'
   ]
-  if (tsconfigPath) {
-    execArgs.push('--project', tsconfigPath)
-  }
   // si on passe un tableau de filenames, on les sépare par un espace pour les passer au compiler
   if (files) {
     execArgs.push(files.reduce((str, file) => {

@@ -37,7 +37,11 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
     '--incremental',
     'false',
     '--watch',
-    'false'
+    'false',
+    '--allowJs',
+    'false',
+    '--noImplicitAny',
+    'true'
   ]
   if (tsconfigPath) {
     execArgs.push('--project', tsconfigPath)

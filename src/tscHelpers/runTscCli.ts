@@ -41,12 +41,14 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
     '--allowJs',
     'true',
     '--noImplicitAny',
-    'true'
+    'true',
+    '--rootDir',
+    workingDir
   ]
   // si on passe un tableau de filenames, on les sépare par un espace pour les passer au compiler
   if (files) {
     execArgs.push(files.reduce((str, file) => {
-      return `${str} ${workingDir}/${file}`
+      return `${str} ${file}`
     }, ''))
   }
 

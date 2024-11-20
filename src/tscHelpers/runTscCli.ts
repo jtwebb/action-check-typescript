@@ -39,9 +39,8 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
     '--watch',
     'false',
     '--allowJs',
-    'true',
+    '--skipLibCheck',
     '--noImplicitAny',
-    'true',
     '--rootDir',
     workingDir
   ]
@@ -49,7 +48,7 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
   if (files) {
     execArgs.push(files.reduce((str, file) => {
       return `${str} ${file}`
-    }, ''))
+    }, '').trim())
   }
 
   try {

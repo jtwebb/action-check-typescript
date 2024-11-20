@@ -30,6 +30,7 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
 
   const execArgs = [
     `${path.join(workingDir, 'node_modules/typescript/bin/tsc')}`,
+    files ? files.reduce((str, file) => `${str} ${file}`, '').trim() : '',
     '--noEmit',
     '--noErrorTruncation',
     '--pretty',
@@ -43,13 +44,7 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
     '--noImplicitAny',
     '--rootDir',
     workingDir
-  ]
-  // si on passe un tableau de filenames, on les sépare par un espace pour les passer au compiler
-  if (files) {
-    execArgs.push(files.reduce((str, file) => {
-      return `${str} ${file}`
-    }, '').trim())
-  }
+  ].filter(Boolean)
 
   try {
     await exec('node', execArgs, options)

@@ -43,7 +43,9 @@ export async function runTscCli({ workingDir, tsconfigPath, files }: Cfg): Promi
     '--skipLibCheck',
     '--noImplicitAny',
     '--rootDir',
-    workingDir
+    workingDir,
+    '--target',
+    'es2020'
   ].filter(Boolean)
 
   try {
